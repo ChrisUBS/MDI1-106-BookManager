@@ -17,7 +17,7 @@ struct StartRatingView: View {
                 Button(action: {
                     rating = starRate
                 }) {
-                    Image(systemName: starRate <= rating ? "star.fill" :"star")
+                    Image(systemName: starRate <= rating ? "star.fill" : "star")
                         .foregroundColor(.yellow)
                         .font(.title2)
                 }.buttonStyle(.plain)

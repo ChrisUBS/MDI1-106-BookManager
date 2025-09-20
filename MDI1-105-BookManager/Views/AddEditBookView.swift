@@ -7,16 +7,20 @@
 
 import SwiftUI
 
-struct EditBookView: View {
+struct AddEditBookView: View {
     @Binding var book: Book
+    var onSave: (Book) -> Void
     @Environment(\.dismiss) var dismiss
     @State private var draftBook: Book
+    @State private var navigationTitle: String
     
     let statuses = ["Planned", "Reading", "Finished"]
     
-    init(book: Binding<Book>) {
+    init(book: Binding<Book>, onSave: @escaping (Book) -> Void) {
         self._book = book
         self._draftBook = State(initialValue: book.wrappedValue)
+        self._navigationTitle = State(initialValue: book.wrappedValue.title.isEmpty ? "Add a new book" : "Edit book")
+        self.onSave = onSave
     }
     
     var body: some View {
@@ -36,18 +40,18 @@ struct EditBookView: View {
                 }
                 
                 Section("MY RATING & REVIEW") {
-//                    Stepper("Rating: \(draftBook.rating, specifier: "%.1f")", value: $draftBook.rating, in: 0...5, step: 0.5)
                     StartRatingView(rating: $draftBook.rating)
                     
                     TextEditor(text: $draftBook.review)
                         .frame(height: 100)
                 }
             }
-            .navigationTitle("Edit Book")
+            .navigationTitle(navigationTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         book = draftBook
+                        onSave(draftBook)
                         dismiss()
                     }
                 }

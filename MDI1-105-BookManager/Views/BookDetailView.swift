@@ -23,7 +23,7 @@ struct BookDetailView: View {
                         .cornerRadius(8)
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(book.title)
+                        Text(book.title ?? "")
                             .font(.title)
                             .fontWeight(.bold)
                         
@@ -31,7 +31,7 @@ struct BookDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         
-                        Text(book.description)
+                        Text(book.description ?? "")
                             .font(.body)
                             .padding(.top, 4)
                     }
@@ -51,19 +51,13 @@ struct BookDetailView: View {
                         }
                     }
                     
-                    Text(book.review)
+                    Text(book.review ?? "")
                         .font(.body)
                         .padding(.top, 4)
                 }
                 HStack {
                     Spacer()
-                    Toggle(isOn: $book.isFavorite) {
-                        Image(systemName: book.isFavorite ? "heart.fill" : "heart")
-                            .renderingMode(.original)
-                    }
-                    .toggleStyle(.button)
-                    .font(.title)
-                    .accessibilityLabel(book.isFavorite ? "Remove from favorites" : "Add to favorites")
+                    FavoriteToggle(isFavorite: $book.isFavorite)
                 }
                 Spacer()
             }
@@ -79,7 +73,7 @@ struct BookDetailView: View {
             }
         }
         .sheet(isPresented: $showingEdit) {
-            EditBookView(book: $book)
+            AddEditBookView(book: $book) { _ in }
         }
     }
 }

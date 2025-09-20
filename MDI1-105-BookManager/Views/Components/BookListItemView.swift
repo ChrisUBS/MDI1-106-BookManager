@@ -18,8 +18,8 @@ struct BookListItemView: View {
                 .scaledToFit()
                 .frame(maxWidth: 48, maxHeight: 48)
             VStack(alignment: .leading) {
-                Text(book.title)
-                Text(book.description)
+                Text(book.title ?? "")
+                Text(book.description ?? "")
                     .font(.system(size: 12))
                     .padding(.leading, 5)
             }

@@ -13,12 +13,12 @@ struct SquareCardView: View {
     
     var body: some View {
         VStack {
-            Text(book.title)
+            Text(book.title ?? "")
                 .font(.headline)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
             Spacer()
-            Text(book.author)
+            Text(book.author ?? "")
                 .font(.subheadline)
                 .lineLimit(1)
         }

@@ -10,29 +10,38 @@ import SwiftUI
 struct BookListView: View {
     
     @Binding var books: [Book]
-    @State var showAddView: Bool = false
-    @State var newBook = Book(title: "New", description: "new book", author: "somebody", year: 2000, category: "Classic", rating: 3, review: "Nice book", status: "Reading")
+    @State var showEditView: Bool = false
+    @State var newBook = Book()
     
     var body: some View {
         NavigationStack {
-            List($books, id: \.self.id) { $book in
-                NavigationLink(destination: BookDetailView(book: $book)) {
-                    BookListItemView(book: book)
+            List {
+                ForEach($books, id: \.id) { $book in
+                    NavigationLink(destination: BookDetailView(book: $book)) {
+                        BookListItemView(book: book)
+                    }
                 }
+                .onDelete(perform: deleteBooks)
             }
             .navigationBarTitle("My Books")
-            .navigationBarItems(trailing: Button("Add", action: {
-                showAddView.toggle()
-            }))
-            .sheet(
-                isPresented: $showAddView,
-                onDismiss: {
-                    let _ = print("This is dismissed")
-                },
-                content: {
-                    EditBookView(book: $newBook)
-                }
+            .navigationBarItems(
+                leading: EditButton(),
+                trailing: Button("Add", action: {
+                    newBook = Book()
+                    showEditView.toggle()
+                })
             )
+            .sheet(isPresented: $showEditView) {
+                AddEditBookView(book: $newBook) { savedBook in
+                    if !books.contains(where: { $0.id == savedBook.id }) {
+                        books.append(savedBook)
+                    }
+                }
+            }
         }
+    }
+    
+    private func deleteBooks(at offsets: IndexSet) {
+        books.remove(atOffsets: offsets)
     }
 }
