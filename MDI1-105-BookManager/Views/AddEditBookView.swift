@@ -30,6 +30,12 @@ struct AddEditBookView: View {
                     TextField("Title", text: $draftBook.title)
                     TextField("Author", text: $draftBook.author)
                     
+                    TextField("Year", text: Binding(
+                            get: { draftBook.year.map { String($0) } ?? "" },
+                            set: { draftBook.year = Int($0) }
+                        ))
+                        .keyboardType(.numberPad)
+                    
                     Picker("Status", selection: $draftBook.status) {
                         ForEach(statuses, id: \.self) { status in
                             Text(status)

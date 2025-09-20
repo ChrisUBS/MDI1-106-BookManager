@@ -28,6 +28,7 @@ struct FavoritesView: View {
                     }
                 }
             }
+            .navigationBarTitle("My Favorite Books")
         }
     }
 }

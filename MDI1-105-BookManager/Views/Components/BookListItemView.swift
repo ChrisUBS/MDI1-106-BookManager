@@ -13,16 +13,31 @@ struct BookListItemView: View {
     
     var body: some View {
         HStack {
-            Image(book.image)
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: 48, maxHeight: 48)
-            VStack(alignment: .leading) {
-                Text(book.title ?? "")
-                Text(book.description ?? "")
-                    .font(.system(size: 12))
-                    .padding(.leading, 5)
+            ZStack(alignment: .bottomLeading) {
+                Image(book.image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: 48, maxHeight: 48)
+                
+                if book.isFavorite {
+                    Image(systemName: "heart.fill")
+                        .foregroundColor(.red)
+                        .padding(2)
+                        .clipShape(Circle())
+                        .offset(x: 25, y: -4)
+                }
             }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(book.title)
+                    .font(.headline)
+                if !book.description.isEmpty {
+                    Text(book.description)
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                }
+            }
+            Spacer()
         }
     }
 }
