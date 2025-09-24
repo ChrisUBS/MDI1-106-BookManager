@@ -17,6 +17,7 @@ struct Book: Identifiable, Hashable {
     var category: String = ""
     var rating: Int = 0
     var review: String = ""
-    var status: String = "Planned"
+    var status: ReadingStatus = .planned
+    var genre: Genre = .unowned
     var isFavorite: Bool = false
 }

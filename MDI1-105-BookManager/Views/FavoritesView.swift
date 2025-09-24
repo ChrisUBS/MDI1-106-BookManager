@@ -11,15 +11,25 @@ struct FavoritesView: View {
     
     @Binding var books: [Book]
     let gridLayout = [GridItem(.flexible()), GridItem(.flexible())]
+    @State var isFilteringPresented: Bool = false
+    @State var selectedGenre: Genre?
+    @State var selectedStatus: ReadingStatus?
     
     // Computed Property
     private var favoriteBooks: [Binding<Book>] {
-        $books.filter { $0.wrappedValue.isFavorite }
+        $books.filter {
+            $0.wrappedValue.isFavorite
+            && (selectedGenre == nil || $0.wrappedValue.genre == selectedGenre)
+            && (selectedStatus == nil || $0.wrappedValue.status == selectedStatus)
+        }
     }
     
     var body: some View {
         NavigationStack {
             ScrollView {
+                if (selectedGenre != nil || selectedStatus != nil) {
+                    Text("Current filter: \(selectedGenre?.rawValue ?? "All") Genre and \(selectedStatus?.rawValue ?? "All") Status")
+                }
                 LazyVGrid(columns: gridLayout) {
                     ForEach(favoriteBooks, id: \.self.id) { book in
                         NavigationLink(destination: BookDetailView(book: book)) {
@@ -29,6 +39,18 @@ struct FavoritesView: View {
                 }
             }
             .navigationBarTitle("My Favorite Books")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {isFilteringPresented = true}) {
+                        // Content of the button
+                        Image(systemName: "line.horizontal.3.decrease.circle")
+                    }
+                    .accessibilityLabel("Open filter options")
+                }
+            }
+            .sheet(isPresented: $isFilteringPresented) {
+                FilterView(selectedGenre: $selectedGenre, selectedStatus: $selectedStatus)
+            }
         }
     }
 }

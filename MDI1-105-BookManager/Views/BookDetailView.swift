@@ -55,7 +55,12 @@ struct BookDetailView: View {
                         .font(.body)
                         .padding(.top, 4)
                 }
+                
                 HStack {
+                    if (book.genre != .unowned) {
+                        CustomCapsule(text: book.genre.rawValue)
+                    }
+                    CustomCapsule(text: book.status.rawValue, color: Color.secondary)
                     Spacer()
                     FavoriteToggle(isFavorite: $book.isFavorite)
                 }

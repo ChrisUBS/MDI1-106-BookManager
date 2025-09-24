@@ -36,9 +36,15 @@ struct AddEditBookView: View {
                         ))
                         .keyboardType(.numberPad)
                     
+                    Picker("Genre", selection: $draftBook.genre) {
+                        ForEach(Genre.allCases) { genre in
+                            Text(genre.displayName)
+                        }
+                    }
+
                     Picker("Status", selection: $draftBook.status) {
-                        ForEach(statuses, id: \.self) { status in
-                            Text(status)
+                        ForEach(ReadingStatus.allCases) { status in
+                            Text(status.displayName)
                         }
                     }
                     
