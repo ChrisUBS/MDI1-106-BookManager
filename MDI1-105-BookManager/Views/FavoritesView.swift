@@ -9,13 +9,16 @@ import SwiftUI
 
 struct FavoritesView: View {
     
+    @AppStorage(SETTINGS_GRID_COLUMNS_KEY) var gridColumns: Int = SETTINGS_GRID_COLUMNS_DEFAULT_VALUE
     @Binding var books: [Book]
-    let gridLayout = [GridItem(.flexible()), GridItem(.flexible())]
     @State var isFilteringPresented: Bool = false
     @State var selectedGenre: Genre?
     @State var selectedStatus: ReadingStatus?
     
-    // Computed Property
+    // Computed Properties
+    private var gridLayout: [GridItem] {
+        Array(repeating: GridItem(.flexible()), count: gridColumns)
+    }
     private var favoriteBooks: [Binding<Book>] {
         $books.filter {
             $0.wrappedValue.isFavorite
