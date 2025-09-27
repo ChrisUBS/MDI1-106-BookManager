@@ -10,6 +10,8 @@ import SwiftUI
 struct FavoritesView: View {
     
     @AppStorage(SETTINGS_GRID_COLUMNS_KEY) var gridColumns: Int = SETTINGS_GRID_COLUMNS_DEFAULT_VALUE
+    @AppStorage(SETTINGS_SHOW_RATING_KEY) var showRating: Bool = SETTINGS_SHOW_RATING_DEFAULT_VALUE
+    @AppStorage(SETTINGS_SHOW_LIST_GRID_KEY) var showListGrid: Bool = SETTINGS_SHOW_LIST_GRID_DEFAULT_VALUE
     @Binding var books: [Book]
     @State var isFilteringPresented: Bool = false
     @State var selectedGenre: Genre?
@@ -36,7 +38,7 @@ struct FavoritesView: View {
                 LazyVGrid(columns: gridLayout) {
                     ForEach(favoriteBooks, id: \.self.id) { book in
                         NavigationLink(destination: BookDetailView(book: book)) {
-                            SquareCardView(book: book)
+                            SquareCardView(book: book, showRating: showRating)
                         }
                     }
                 }

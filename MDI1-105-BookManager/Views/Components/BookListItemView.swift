@@ -10,6 +10,7 @@ import SwiftUI
 struct BookListItemView: View {
     
     var book: Book
+    var showRating: Bool
     
     var body: some View {
         HStack {
@@ -35,6 +36,14 @@ struct BookListItemView: View {
                     Text(book.description)
                         .font(.system(size: 12))
                         .foregroundColor(.gray)
+                }
+                if (showRating) {
+                    HStack(spacing: 2) {
+                        ForEach(1...5, id: \.self) { i in
+                            Image(systemName: i <= book.rating ? "star.fill" : "star")
+                                .foregroundColor(.yellow)
+                        }
+                    }
                 }
             }
             Spacer()

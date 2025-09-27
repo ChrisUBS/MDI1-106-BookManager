@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SquareCardView: View {
     @Binding var book: Book
+    var showRating: Bool
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -18,6 +19,17 @@ struct SquareCardView: View {
                 .scaledToFill()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .clipped()
+            
+            if book.isFavorite {
+                Image(systemName: "heart.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(.red)
+                    .padding(2)
+                    .clipShape(Circle())
+                    .offset(x: 70, y: -260)
+            }
             
             // Gradient overlay for readability
             LinearGradient(
@@ -46,11 +58,13 @@ struct SquareCardView: View {
                     Spacer()
                     
                     // Rating stars
-                    HStack(spacing: 2) {
-                        ForEach(0..<5) { i in
-                            Image(systemName: i < book.rating ? "star.fill" : "star")
-                                .foregroundColor(.yellow)
-                                .font(.caption2)
+                    if (showRating) {
+                        HStack(spacing: 2) {
+                            ForEach(0..<5) { i in
+                                Image(systemName: i < book.rating ? "star.fill" : "star")
+                                    .foregroundColor(.yellow)
+                                    .font(.caption2)
+                            }
                         }
                     }
                 }
