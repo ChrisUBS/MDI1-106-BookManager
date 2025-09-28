@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BookDetailView: View {
-    @Binding var book: Book
+    @Bindable var book: PersistentBook
     @State private var showingEdit = false
     
     var body: some View {
@@ -16,7 +16,11 @@ struct BookDetailView: View {
             VStack(alignment: .leading, spacing: 16) {
                 
                 HStack(alignment: .top, spacing: 16) {
-                    Image(book.image)
+                    Image(
+                        uiImage: book.imageData != nil
+                        ? UIImage(data: book.imageData!)!
+                        : UIImage()
+                    )
                         .resizable()
                         .scaledToFit()
                         .frame(width: 120)
@@ -31,7 +35,7 @@ struct BookDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         
-                        Text(book.description ?? "")
+                        Text(book.summary ?? "")
                             .font(.body)
                             .padding(.top, 4)
                     }
@@ -57,7 +61,7 @@ struct BookDetailView: View {
                 }
                 
                 HStack {
-                    if (book.genre != .unowned) {
+                    if (book.genre != .unkowned) {
                         CustomCapsule(text: book.genre.rawValue)
                     }
                     CustomCapsule(text: book.status.rawValue, color: Color.secondary)
@@ -78,7 +82,7 @@ struct BookDetailView: View {
             }
         }
         .sheet(isPresented: $showingEdit) {
-            AddEditBookView(book: $book) { _ in }
+            AddEditBookView(book: book) { _ in }
         }
     }
 }

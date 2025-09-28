@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import SwiftData
 
 struct Book: Identifiable, Hashable {
     var id = UUID()
     var title: String = ""
-    var image: String = "default_book"
+    var imageData: Data?
     var description: String = ""
     var author: String = ""
     var year: Int? = nil
@@ -18,6 +19,6 @@ struct Book: Identifiable, Hashable {
     var rating: Int = 0
     var review: String = ""
     var status: ReadingStatus = .planned
-    var genre: Genre = .unowned
+    var genre: Genre = .unkowned
     var isFavorite: Bool = false
 }

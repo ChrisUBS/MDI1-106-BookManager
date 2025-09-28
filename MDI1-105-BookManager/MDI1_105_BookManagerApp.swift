@@ -10,23 +10,20 @@ import SwiftData
 
 @main
 struct MDI1_105_BookManagerApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
+    let modelContainer: ModelContainer
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .modelContainer(modelContainer)
         }
-        .modelContainer(sharedModelContainer)
+    }
+    
+    init() {
+        do {
+            modelContainer = try ModelContainer(for: UploadedImage.self, PersistentBook.self)
+        } catch {
+            fatalError("Failed to load model container")
+        }
     }
 }

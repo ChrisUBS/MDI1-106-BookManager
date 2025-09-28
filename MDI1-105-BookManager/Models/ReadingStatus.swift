@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ReadingStatus: String, CaseIterable, Identifiable {
+enum ReadingStatus: String, CaseIterable, Identifiable, Hashable, Codable {
     case planned = "Planned"
     case reading = "Reading"
     case dropped = "Dropped"

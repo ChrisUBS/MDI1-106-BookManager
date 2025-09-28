@@ -12,7 +12,6 @@ struct ContentView: View {
     
     @AppStorage(SETTINGS_THEME_KEY) var theme: Theme = .light
     @AppStorage(SETTINGS_ACCENT_COLOR_KEY) var accentTintColor: Color = SETTINGS_ACCENT_COLOR_DEFAULT_VALUE
-    @State var books = getBooks()
     
     // Computed Property
     var colorScheme: ColorScheme? {
@@ -28,13 +27,17 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            BookListView(books: $books)
+            BookListView()
             .tabItem {
                 Label("Books", systemImage: "books.vertical.fill")
             }
-            FavoritesView(books: $books)
+            FavoritesView()
                 .tabItem{
                     Label("Favorites", systemImage: "heart.fill")
+                }
+            ImageViewer()
+                .tabItem {
+                    Label("Images", systemImage: "photo")
                 }
             SettingsView()
                 .tabItem{

@@ -9,13 +9,17 @@ import SwiftUI
 
 struct BookListItemView: View {
     
-    var book: Book
+    var book: PersistentBook
     var showRating: Bool
     
     var body: some View {
         HStack {
             ZStack(alignment: .bottomLeading) {
-                Image(book.image)
+                Image(
+                    uiImage: book.imageData != nil
+                    ? UIImage(data: book.imageData!)!
+                    : UIImage(resource: .defaultBook)
+                )
                     .resizable()
                     .scaledToFit()
                     .frame(maxWidth: 48, maxHeight: 48)
@@ -32,8 +36,8 @@ struct BookListItemView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(book.title)
                     .font(.headline)
-                if !book.description.isEmpty {
-                    Text(book.description)
+                if !book.summary.isEmpty {
+                    Text(book.summary)
                         .font(.system(size: 12))
                         .foregroundColor(.gray)
                 }

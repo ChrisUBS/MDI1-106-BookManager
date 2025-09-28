@@ -7,8 +7,8 @@
 
 import Foundation
 
-enum Genre: String, CaseIterable, Identifiable {
-    case unowned = "Unowned"
+enum Genre: String, CaseIterable, Identifiable, Hashable, Codable {
+    case unkowned = "Unkowned"
     case classic = "Classic"
     case fantasy = "Fantasy"
     case scienceFiction = "Science Fiction"

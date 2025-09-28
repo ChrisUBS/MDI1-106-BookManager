@@ -6,71 +6,88 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AddEditBookView: View {
-    @Binding var book: Book
-    var onSave: (Book) -> Void
-    @Environment(\.dismiss) var dismiss
-    @State private var draftBook: Book
-    @State private var navigationTitle: String
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    
+    @Bindable var book: PersistentBook
+    
+    var onSave: (PersistentBook) -> Void
+    @State private var cover: UIImage? = nil
     
     let statuses = ["Planned", "Reading", "Finished"]
     
-    init(book: Binding<Book>, onSave: @escaping (Book) -> Void) {
-        self._book = book
-        self._draftBook = State(initialValue: book.wrappedValue)
-        self._navigationTitle = State(initialValue: book.wrappedValue.title.isEmpty ? "Add a new book" : "Edit book")
+    init(book: PersistentBook, onSave: @escaping (PersistentBook) -> Void) {
+        self.book = book
         self.onSave = onSave
+        if let data = book.imageData {
+            self._cover = State(initialValue: UIImage(data: data))
+        }
     }
     
     var body: some View {
         NavigationStack {
             Form {
+                Section("Book Cover") {
+                    ImageField(image: $cover)
+                }
+                
                 Section("BOOK DETAILS") {
-                    TextField("Title", text: $draftBook.title)
-                    TextField("Author", text: $draftBook.author)
+                    TextField("Title", text: $book.title)
+                    TextField("Author", text: $book.author)
                     
                     TextField("Year", text: Binding(
-                            get: { draftBook.year.map { String($0) } ?? "" },
-                            set: { draftBook.year = Int($0) }
-                        ))
-                        .keyboardType(.numberPad)
+                        get: { book.year.map(String.init) ?? "" },
+                        set: { book.year = Int($0) }
+                    ))
+                    .keyboardType(.numberPad)
                     
-                    Picker("Genre", selection: $draftBook.genre) {
-                        ForEach(Genre.allCases) { genre in
+                    Picker("Genre", selection: $book.genre) {
+                        ForEach(Genre.allCases, id: \.self) { genre in
                             Text(genre.displayName)
                         }
                     }
-
-                    Picker("Status", selection: $draftBook.status) {
-                        ForEach(ReadingStatus.allCases) { status in
+                    
+                    Picker("Status", selection: $book.status) {
+                        ForEach(ReadingStatus.allCases, id: \.self) { status in
                             Text(status.displayName)
                         }
                     }
                     
-                    TextField("Description", text: $draftBook.description)
+                    TextField("Description", text: $book.summary)
                 }
                 
                 Section("MY RATING & REVIEW") {
-                    StartRatingView(rating: $draftBook.rating)
-                    
-                    TextEditor(text: $draftBook.review)
+                    StartRatingView(rating: $book.rating)
+                    TextEditor(text: $book.review)
                         .frame(height: 100)
                 }
             }
-            .navigationTitle(navigationTitle)
+            .navigationTitle(book.title.isEmpty ? "Add a new book" : "Edit book")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        book = draftBook
-                        onSave(draftBook)
+                        if let cover {
+                            let newImage = UploadedImage(
+                                imageName: "image for \(book.title)",
+                                imageData: cover.jpegData(compressionQuality: 0.8)
+                            )
+                            do {
+                                modelContext.insert(newImage)
+                                try modelContext.save()
+                            } catch {
+                                print("Failed to save the image: \(error)")
+                            }
+                            book.imageData = newImage.imageData
+                        }
+                        onSave(book)
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+                    Button("Cancel") { dismiss() }
                 }
             }
         }

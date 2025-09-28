@@ -6,15 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct BookListView: View {
     
     @AppStorage(SETTINGS_GRID_COLUMNS_KEY) var gridColumns: Int = SETTINGS_GRID_COLUMNS_DEFAULT_VALUE
     @AppStorage(SETTINGS_SHOW_RATING_KEY) var showRating: Bool = SETTINGS_SHOW_RATING_DEFAULT_VALUE
     @AppStorage(SETTINGS_SHOW_LIST_GRID_KEY) var showListGrid: Bool = SETTINGS_SHOW_LIST_GRID_DEFAULT_VALUE
-    @Binding var books: [Book]
+    @Query var books: [PersistentBook]
+    @Environment(\.modelContext) private var context
     @State var showEditView: Bool = false
-    @State var newBook = Book()
+    @State var newBook = PersistentBook()
     @State var isFilteringPresented: Bool = false
     @State var selectedGenre: Genre?
     @State var selectedStatus: ReadingStatus?
@@ -23,10 +25,10 @@ struct BookListView: View {
     private var gridLayout: [GridItem] {
         Array(repeating: GridItem(.flexible()), count: gridColumns)
     }
-    private var listBooks: [Binding<Book>] {
-        $books.filter {
-            (selectedGenre == nil || $0.wrappedValue.genre == selectedGenre)
-            && (selectedStatus == nil || $0.wrappedValue.status == selectedStatus)
+    private var listBooks: [PersistentBook] {
+        books.filter {
+            (selectedGenre == nil || $0.genre == selectedGenre)
+            && (selectedStatus == nil || $0.status == selectedStatus)
         }
     }
     
@@ -38,7 +40,7 @@ struct BookListView: View {
             if (showListGrid) {
                 ScrollView {
                     LazyVGrid(columns: gridLayout) {
-                        ForEach(listBooks, id: \.self.id) { book in
+                        ForEach(listBooks, id: \.id) { book in
                             NavigationLink(destination: BookDetailView(book: book)) {
                                 SquareCardView(book: book, showRating: showRating)
                             }
@@ -53,15 +55,14 @@ struct BookListView: View {
                         Image(systemName: "line.horizontal.3.decrease.circle")
                     },
                     trailing: Button("Add", action: {
-                        newBook = Book()
+                        newBook = PersistentBook()
                         showEditView.toggle()
                     })
                 )
                 .sheet(isPresented: $showEditView) {
-                    AddEditBookView(book: $newBook) { savedBook in
-                        if !books.contains(where: { $0.id == savedBook.id }) {
-                            books.append(savedBook)
-                        }
+                    AddEditBookView(book: newBook) { savedBook in
+                        context.insert(savedBook)
+                        try? context.save()
                     }
                 }
                 .sheet(isPresented: $isFilteringPresented) {
@@ -69,8 +70,8 @@ struct BookListView: View {
                 }
             } else {
                 List {
-                    ForEach(listBooks, id: \.id) { $book in
-                        NavigationLink(destination: BookDetailView(book: $book)) {
+                    ForEach(listBooks, id: \.id) { book in
+                        NavigationLink(destination: BookDetailView(book: book)) {
                             BookListItemView(book: book, showRating: showRating)
                         }
                     }
@@ -84,14 +85,15 @@ struct BookListView: View {
                         Image(systemName: "line.horizontal.3.decrease.circle")
                     },
                     trailing: Button("Add", action: {
-                        newBook = Book()
+                        newBook = PersistentBook()
                         showEditView.toggle()
                     })
                 )
                 .sheet(isPresented: $showEditView) {
-                    AddEditBookView(book: $newBook) { savedBook in
+                    AddEditBookView(book: newBook) { savedBook in
                         if !books.contains(where: { $0.id == savedBook.id }) {
-                            books.append(savedBook)
+                            context.insert(savedBook)
+                            try? context.save()
                         }
                     }
                 }
@@ -103,6 +105,9 @@ struct BookListView: View {
     }
     
     private func deleteBooks(at offsets: IndexSet) {
-        books.remove(atOffsets: offsets)
+        for index in offsets {
+            context.delete(listBooks[index])
+        }
+        try? context.save()
     }
 }

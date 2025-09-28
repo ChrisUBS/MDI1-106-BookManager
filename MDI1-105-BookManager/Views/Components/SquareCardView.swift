@@ -8,13 +8,17 @@
 import SwiftUI
 
 struct SquareCardView: View {
-    @Binding var book: Book
+    var book: PersistentBook
     var showRating: Bool
     
     var body: some View {
         ZStack(alignment: .bottom) {
             // Background image
-            Image(book.image)
+            Image(
+                uiImage: book.imageData != nil
+                ? UIImage(data: book.imageData!)!
+                : UIImage(resource: .defaultBook)
+            )
                 .resizable()
                 .scaledToFill()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
